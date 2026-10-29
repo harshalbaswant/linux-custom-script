@@ -62,3 +62,34 @@ unset password confirm_password
 
 echo "User creation completed successfully."
 echo "Home directory: /home/$username"
+
+
+
+Note: After saving the script I've created alias i.e "createuser".
+
+1. Move the script to a permanent location
+For example, store it in /usr/local/sbin/:
+
+$sudo cp create_user.sh /usr/local/sbin/create_user.sh
+$sudo chmod 755 /usr/local/sbin/create_user.shnano 
+
+2. Add the permanent alias
+Open your Bash configuration file:
+$ vi ~/.bashrc
+
+Add this line at the end:
+
+alias createuser='sudo /usr/local/sbin/create_user.sh'
+
+Save and exit.
+
+3. Apply the changes
+source ~/.bashrc
+
+5. Verify the alias
+
+alias createuser
+
+
+Note: This alias is permanent for your current user because it is stored in ~/.bashrc. 
+      Other users will need their own alias, or an administrator can configure a system-wide alias in /etc/bashrc.
