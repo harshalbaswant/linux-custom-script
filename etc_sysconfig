@@ -1,0 +1,111 @@
+================================================================================
+              /etc/sysconfig IN LINUX?
+================================================================================
+
+1. WHAT IS /etc/sysconfig? (IN PLAIN WORDS)
+--------------------------------------------------------------------------------
+Think of Linux services like electrical appliances. 
+- The program or code is the motor inside the appliance (how it runs).
+- The settings in `/etc/sysconfig` are the control knobs and dials on the outside 
+  (the options you choose, like speed or temperature).
+
+In Linux systems like Red Hat, CentOS, Fedora, and Rocky Linux, `/etc/sysconfig` 
+is simply a folder that holds plain text files. These files tell system programs 
+and services what options to use whenever they start up.
+
+
+2. WHY DOES LINUX USE THIS FOLDER?
+--------------------------------------------------------------------------------
+Why not just change the service's main code directly?
+
+Imagine updating an app on your phone. If an update comes out and replaces the 
+app, any custom edits you made inside the app code would be erased!
+
+By keeping settings in `/etc/sysconfig`:
+- The system can safely update or replace the main service code.
+- Your personal settings stay safe and unchanged in `/etc/sysconfig`.
+- It keeps startup code clean and separate from user settings.
+
+
+3. WHAT DO THE FILES LOOK LIKE?
+--------------------------------------------------------------------------------
+Files in this folder are very simple. They look like simple variable lists:
+
+    SETTING_NAME=value
+    ANOTHER_SETTING="value with spaces"
+
+Important rules:
+- No spaces around the equal sign (`=`).
+  Right:  ONBOOT=yes
+  Wrong:  ONBOOT = yes
+- Lines starting with `#` are comments (notes meant for humans; the computer ignores them).
+
+
+4. MOST COMMON FILES YOU WILL SEE
+--------------------------------------------------------------------------------
+
+A. network-scripts/ (Folder)
+   - Contains settings for your internet and local network cards.
+   - Example file: `ifcfg-eth0` (settings for network card "eth0").
+   - Controls things like:
+       * Should the network start automatically? (`ONBOOT=yes`)
+       * What is the machine's IP address? (`IPADDR=192.168.1.10`)
+
+B. network (File)
+   - Holds global network settings, such as your computer's name (HOSTNAME).
+
+C. iptables (File)
+   - Holds simple firewall rules that block or allow network traffic when the 
+     system boots.
+
+D. i18n (File)
+   - Stands for "internationalization".
+   - Sets the default language and text display style (like English, UTF-8).
+
+E. Program-Specific Files (like `httpd`, `docker`, or `sshd`)
+   - Extra options passed to programs when they start up.
+   - For example, passing `-D` to tell a web server to turn on extra debugging.
+
+
+5. HOW DOES MODERN LINUX (systemd) USE IT?
+--------------------------------------------------------------------------------
+Modern Linux uses a manager called `systemd` to start programs.
+
+When `systemd` starts a service, it looks for a line called `EnvironmentFile`:
+
+    EnvironmentFile=-/etc/sysconfig/httpd
+    ExecStart=/usr/sbin/httpd $OPTIONS
+
+This just means:
+1. Open the file `/etc/sysconfig/httpd`.
+2. Read the custom settings (like `$OPTIONS`).
+3. Start the service with those settings.
+
+
+6. RED HAT VS. UBUNTU: A QUICK NOTE
+--------------------------------------------------------------------------------
+Not every Linux distribution uses `/etc/sysconfig`.
+
+- Red Hat, CentOS, Fedora, Rocky Linux: Use `/etc/sysconfig/`
+- Ubuntu and Debian: Use `/etc/default/` for the exact same purpose!
+
+
+7. THREE GOLDEN RULES BEFORE EDITING
+--------------------------------------------------------------------------------
+1. Always make a backup copy first!
+   If you break a setting, you can easily restore it.
+   Example:
+   cp /etc/sysconfig/network ~/network.backup
+
+2. Be careful with typos:
+   Because these files are read directly by scripts, a small spelling mistake 
+   can stop a service from turning on.
+
+3. Always restart the service after making a change:
+   Changing a file does not take effect immediately. You must restart the 
+   program:
+   sudo systemctl restart <service_name>
+
+================================================================================
+                                 END OF GUIDE
+================================================================================
